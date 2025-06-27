@@ -2,7 +2,7 @@ import React from "react";
 import blissLogo from "../assets/bliss-logo.png";
 
 const Header = () => (
-  <header className="fixed top-0 left-0 w-full z-20 bg-transparent">
+  <header className="bg-transparent">
     <div className="flex items-center px-6 py-4">
       <img
         src={blissLogo}

@@ -1,24 +1,88 @@
 import React from "react";
 
+const dummyTransactions = [
+  {
+    id: 1,
+    category: "Food",
+    desc: "Groceries",
+    amount: -45.5,
+    date: "2024-06-25",
+  },
+  {
+    id: 2,
+    category: "Transport",
+    desc: "Gas",
+    amount: -20,
+    date: "2024-06-24",
+  },
+  {
+    id: 3,
+    category: "Entertainment",
+    desc: "Movie",
+    amount: -15,
+    date: "2024-06-23",
+  },
+  {
+    id: 4,
+    category: "Food",
+    desc: "Lunch",
+    amount: -12.75,
+    date: "2024-06-22",
+  },
+  {
+    id: 5,
+    category: "Income",
+    desc: "Paycheck",
+    amount: 2000,
+    date: "2024-06-20",
+  },
+  {
+    id: 6,
+    category: "Shopping",
+    desc: "Clothes",
+    amount: -80,
+    date: "2024-06-19",
+  },
+  {
+    id: 7,
+    category: "Savings",
+    desc: "Transfer to Savings",
+    amount: -100,
+    date: "2024-06-18",
+  },
+];
+
+const formatCurrency = (amount) =>
+  amount.toLocaleString("en-US", { style: "currency", currency: "USD" });
+
 const TransactionsPage = () => {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-lg shadow p-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-6">
-            Transactions
-          </h1>
-
-          <div className="text-center py-12">
-            <div className="text-6xl mb-4">📊</div>
-            <h2 className="text-xl font-semibold text-gray-700 mb-2">
-              Transactions Coming Soon!
-            </h2>
-            <p className="text-gray-500">
-              This is where you'll manage your income and expense transactions.
-            </p>
-          </div>
-        </div>
+    <div className="space-y-8">
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-sage text-2xl font-semibold">Transactions</h1>
+        <button className="btn-accent">+ Add Transaction</button>
+      </div>
+      <div className="bg-charcoal border border-sage/30 rounded-xl p-6 min-h-[180px]">
+        <div className="text-peach font-medium mb-4">Your Transactions</div>
+        <ul className="divide-y divide-sage/20">
+          {dummyTransactions.map((tx) => (
+            <li key={tx.id} className="py-3 flex items-center justify-between">
+              <div>
+                <div className="text-sage font-medium text-sm">{tx.desc}</div>
+                <div className="text-peach text-xs">
+                  {tx.category} • {tx.date}
+                </div>
+              </div>
+              <div
+                className={`text-right font-semibold ${
+                  tx.amount < 0 ? "text-coral" : "text-sage"
+                }`}
+              >
+                {formatCurrency(tx.amount)}
+              </div>
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );

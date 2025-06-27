@@ -1,22 +1,39 @@
 import React from "react";
 
+const dummyUser = {
+  name: "Bliss User",
+  email: "bliss@example.com",
+  currency: "USD",
+  theme: "Light",
+};
+
 const ProfilePage = () => {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-lg shadow p-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-6">Profile</h1>
-
-          <div className="text-center py-12">
-            <div className="text-6xl mb-4">👤</div>
-            <h2 className="text-xl font-semibold text-gray-700 mb-2">
-              Profile Coming Soon!
-            </h2>
-            <p className="text-gray-500">
-              This is where you'll manage your account settings and preferences.
-            </p>
+    <div className="flex justify-center items-center min-h-[60vh]">
+      <div className="bg-charcoal border border-sage/30 rounded-xl p-8 w-full max-w-md flex flex-col items-center">
+        <div className="text-sage text-2xl font-semibold mb-2">Profile</div>
+        <div className="text-peach mb-6">Account & Settings</div>
+        <div className="w-full space-y-4 mb-8">
+          <div>
+            <div className="text-xs text-peach">Name</div>
+            <div className="text-sage font-medium">{dummyUser.name}</div>
+          </div>
+          <div>
+            <div className="text-xs text-peach">Email</div>
+            <div className="text-sage font-medium">{dummyUser.email}</div>
+          </div>
+          <div className="flex gap-8">
+            <div>
+              <div className="text-xs text-peach">Currency</div>
+              <div className="text-sage font-medium">{dummyUser.currency}</div>
+            </div>
+            <div>
+              <div className="text-xs text-peach">Theme</div>
+              <div className="text-sage font-medium">{dummyUser.theme}</div>
+            </div>
           </div>
         </div>
+        <button className="btn-accent w-full">Log out</button>
       </div>
     </div>
   );
