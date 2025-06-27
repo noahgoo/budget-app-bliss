@@ -1,6 +1,6 @@
 import React from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { dummyBudgets } from "../constants/dummyBudgets";
+import { useBudgets } from "../contexts/BudgetsContext";
 
 const dummyBalance = 3250.0;
 const dummyTransactions = [
@@ -53,6 +53,7 @@ function getBarColor(percent) {
 
 const DashboardPage = () => {
   const { currentUser } = useAuth();
+  const { budgets } = useBudgets();
 
   return (
     <div className="space-y-8">
@@ -69,7 +70,7 @@ const DashboardPage = () => {
         <div className="bg-charcoal border border-sage/30 rounded-xl p-6 flex flex-col min-h-[180px]">
           <div className="text-peach font-medium mb-4">Budget vs. Spending</div>
           <div className="space-y-4">
-            {dummyBudgets.map((b) => {
+            {budgets.map((b) => {
               const percent = Math.min((b.spent / b.limit) * 100, 100);
               const barColor = getBarColor(percent);
               return (

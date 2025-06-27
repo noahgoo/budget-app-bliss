@@ -6,6 +6,8 @@ import {
   Navigate,
 } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { BudgetsProvider } from "./contexts/BudgetsContext";
+import { TransactionsProvider } from "./contexts/TransactionsContext";
 import "./index.css";
 import Header from "./components/Header";
 import Navigation from "./components/Navigation";
@@ -40,7 +42,11 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <AppLayout />
+        <BudgetsProvider>
+          <TransactionsProvider>
+            <AppLayout />
+          </TransactionsProvider>
+        </BudgetsProvider>
       </AuthProvider>
     </Router>
   );
