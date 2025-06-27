@@ -25,8 +25,16 @@ export function BudgetsProvider({ children }) {
     setBudgets((prev) => prev.filter((b) => b.id !== id));
   }
 
+  function updateBudget(id, updates) {
+    setBudgets((prev) =>
+      prev.map((b) => (b.id === id ? { ...b, ...updates } : b))
+    );
+  }
+
   return (
-    <BudgetsContext.Provider value={{ budgets, addBudget, deleteBudget }}>
+    <BudgetsContext.Provider
+      value={{ budgets, addBudget, deleteBudget, updateBudget }}
+    >
       {children}
     </BudgetsContext.Provider>
   );

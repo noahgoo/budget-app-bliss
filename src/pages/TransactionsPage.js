@@ -9,13 +9,16 @@ const formatCurrency = (amount) =>
 const today = () => new Date().toISOString().slice(0, 10);
 
 const TransactionsPage = () => {
-  const { transactions, addTransaction, deleteTransaction } = useTransactions();
+  const { transactions, addTransaction, deleteTransaction, updateTransaction } =
+    useTransactions();
   const [showModal, setShowModal] = useState(false);
   const [category, setCategory] = useState("");
   const [amount, setAmount] = useState("");
   const [desc, setDesc] = useState("");
   const [date, setDate] = useState(today());
   const [editMode, setEditMode] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [editFields, setEditFields] = useState({});
 
   const handleOpenModal = () => {
     setShowModal(true);
@@ -59,27 +62,128 @@ const TransactionsPage = () => {
               key={tx.id}
               className="py-3 flex items-center justify-between relative group"
             >
-              <div>
-                <div className="text-sage font-medium text-sm">{tx.desc}</div>
-                <div className="text-peach text-xs">
-                  {tx.category} • {tx.date}
-                </div>
-              </div>
-              <div
-                className={`text-right font-semibold ${
-                  tx.amount < 0 ? "text-coral" : "text-sage"
-                }`}
-              >
-                {formatCurrency(tx.amount)}
-              </div>
-              {editMode && (
-                <button
-                  className="ml-3 p-1 rounded-full bg-red/10 hover:bg-red/30 transition-colors"
-                  onClick={() => deleteTransaction(tx.id)}
-                  aria-label={`Delete transaction for ${tx.desc}`}
+              {editMode && editingId === tx.id ? (
+                <form
+                  className="flex flex-1 items-center gap-2"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    updateTransaction(tx.id, editFields);
+                    setEditingId(null);
+                    setEditFields({});
+                  }}
                 >
-                  <Trash2 className="h-5 w-5 text-red" />
-                </button>
+                  <select
+                    className="input bg-charcoal text-white text-xs max-w-[120px]"
+                    value={editFields.category || tx.category}
+                    onChange={(e) =>
+                      setEditFields((f) => ({ ...f, category: e.target.value }))
+                    }
+                    required
+                  >
+                    <option value="" disabled>
+                      Select category
+                    </option>
+                    {TRANSACTION_CATEGORIES.map((cat) => (
+                      <option key={cat.id} value={cat.name}>
+                        {cat.name}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    className="input text-xs max-w-[80px]"
+                    type="number"
+                    step="0.01"
+                    value={
+                      editFields.amount !== undefined
+                        ? editFields.amount
+                        : tx.amount
+                    }
+                    onChange={(e) =>
+                      setEditFields((f) => ({
+                        ...f,
+                        amount: parseFloat(e.target.value),
+                      }))
+                    }
+                    required
+                  />
+                  <input
+                    className="input text-xs max-w-[120px]"
+                    type="text"
+                    value={editFields.desc || tx.desc}
+                    onChange={(e) =>
+                      setEditFields((f) => ({ ...f, desc: e.target.value }))
+                    }
+                    required
+                  />
+                  <input
+                    className="input text-xs max-w-[110px]"
+                    type="date"
+                    value={editFields.date || tx.date}
+                    onChange={(e) =>
+                      setEditFields((f) => ({ ...f, date: e.target.value }))
+                    }
+                    required
+                  />
+                  <button type="submit" className="ml-2 btn-primary btn-xs">
+                    Save
+                  </button>
+                  <button
+                    type="button"
+                    className="ml-1 btn-accent btn-xs"
+                    onClick={() => {
+                      setEditingId(null);
+                      setEditFields({});
+                    }}
+                  >
+                    Cancel
+                  </button>
+                </form>
+              ) : (
+                <>
+                  <div>
+                    <div className="text-sage font-medium text-sm">
+                      {tx.desc}
+                    </div>
+                    <div className="text-peach text-xs">
+                      {tx.category} • {tx.date}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-x-2 min-w-[150px] justify-end">
+                    <div
+                      className={`text-right font-semibold ${
+                        tx.amount < 0 ? "text-coral" : "text-sage"
+                      }`}
+                    >
+                      {formatCurrency(tx.amount)}
+                    </div>
+                    {editMode && (
+                      <>
+                        <button
+                          className="ml-1 p-1 rounded-full bg-peach/10 hover:bg-peach/20 transition-colors"
+                          onClick={() => {
+                            setEditingId(tx.id);
+                            setEditFields({
+                              category: tx.category,
+                              amount: tx.amount,
+                              desc: tx.desc,
+                              date: tx.date,
+                            });
+                          }}
+                          aria-label={`Edit transaction for ${tx.desc}`}
+                        >
+                          <Pencil className="h-5 w-5 text-peach" />
+                        </button>
+                        <button
+                          className="ml-1 p-1 rounded-full bg-red/10 hover:bg-red/30 transition-colors"
+                          onClick={() => deleteTransaction(tx.id)}
+                          aria-label={`Delete transaction for ${tx.desc}`}
+                        >
+                          <Trash2 className="h-5 w-5 text-red" />
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </>
               )}
             </li>
           ))}

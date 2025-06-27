@@ -75,9 +75,20 @@ export function TransactionsProvider({ children }) {
     setTransactions((prev) => prev.filter((t) => t.id !== id));
   }
 
+  function updateTransaction(id, updatedFields) {
+    setTransactions((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, ...updatedFields } : t))
+    );
+  }
+
   return (
     <TransactionsContext.Provider
-      value={{ transactions, addTransaction, deleteTransaction }}
+      value={{
+        transactions,
+        addTransaction,
+        deleteTransaction,
+        updateTransaction,
+      }}
     >
       {children}
     </TransactionsContext.Provider>

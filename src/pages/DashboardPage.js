@@ -1,8 +1,8 @@
 import React from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useBudgets } from "../contexts/BudgetsContext";
+import { useTransactions } from "../contexts/TransactionsContext";
 
-const dummyBalance = 3250.0;
 const dummyTransactions = [
   {
     id: 1,
@@ -54,6 +54,8 @@ function getBarColor(percent) {
 const DashboardPage = () => {
   const { currentUser } = useAuth();
   const { budgets } = useBudgets();
+  const { transactions } = useTransactions();
+  const totalBalance = transactions.reduce((sum, tx) => sum + tx.amount, 0);
 
   return (
     <div className="space-y-8">
@@ -63,7 +65,7 @@ const DashboardPage = () => {
       <div className="bg-sage/20 rounded-xl p-6 flex flex-col items-center mb-6">
         <div className="text-peach text-lg mb-1">Total Balance</div>
         <div className="text-4xl font-bold text-sage">
-          {formatCurrency(dummyBalance)}
+          {formatCurrency(totalBalance)}
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -97,7 +99,7 @@ const DashboardPage = () => {
         <div className="bg-charcoal border border-sage/30 rounded-xl p-6 flex flex-col min-h-[180px]">
           <div className="text-peach font-medium mb-4">Recent Transactions</div>
           <ul className="divide-y divide-sage/20">
-            {dummyTransactions.slice(0, 5).map((tx) => (
+            {transactions.slice(0, 5).map((tx) => (
               <li
                 key={tx.id}
                 className="py-2 flex items-center justify-between"

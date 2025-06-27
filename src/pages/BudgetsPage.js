@@ -14,12 +14,13 @@ function getBarColor(percent) {
 }
 
 const BudgetsPage = () => {
-  const { budgets, addBudget, deleteBudget } = useBudgets();
+  const { budgets, addBudget, deleteBudget, updateBudget } = useBudgets();
   const [showModal, setShowModal] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [customCategory, setCustomCategory] = useState("");
   const [amount, setAmount] = useState("");
   const [editMode, setEditMode] = useState(false);
+  const [editValues, setEditValues] = useState({});
 
   const handleOpenModal = () => {
     setShowModal(true);
@@ -35,6 +36,28 @@ const BudgetsPage = () => {
       selectedCategory === "custom" ? customCategory : selectedCategory;
     addBudget({ category: categoryName, limit: parseFloat(amount) });
     setShowModal(false);
+  };
+
+  const handleEditChange = (id, value) => {
+    setEditValues((prev) => ({ ...prev, [id]: value }));
+  };
+
+  const handleEditBlur = (id) => {
+    const newValue = parseFloat(editValues[id]);
+    if (!isNaN(newValue) && newValue > 0) {
+      updateBudget(id, { limit: newValue });
+    }
+    setEditValues((prev) => {
+      const copy = { ...prev };
+      delete copy[id];
+      return copy;
+    });
+  };
+
+  const handleEditKeyDown = (e, id) => {
+    if (e.key === "Enter") {
+      e.target.blur();
+    }
   };
 
   return (
@@ -66,17 +89,37 @@ const BudgetsPage = () => {
               <li key={b.id} className="flex flex-col gap-1 relative group">
                 <div className="flex justify-between items-center mb-1">
                   <span className="text-sage font-semibold">{b.category}</span>
-                  <span className="text-peach text-sm">
-                    {formatCurrency(b.spent)} / {formatCurrency(b.limit)}
-                  </span>
-                  {editMode && (
-                    <button
-                      className="ml-3 p-1 rounded-full bg-red/10 hover:bg-red/30 transition-colors"
-                      onClick={() => deleteBudget(b.id)}
-                      aria-label={`Delete budget for ${b.category}`}
-                    >
-                      <Trash2 className="h-5 w-5 text-red" />
-                    </button>
+                  {editMode ? (
+                    <div className="flex items-center gap-2">
+                      <input
+                        className="input w-24 text-right py-1 px-2 text-peach border-peach focus:ring-peach focus:border-peach"
+                        type="number"
+                        min="1"
+                        step="0.01"
+                        value={
+                          editValues[b.id] !== undefined
+                            ? editValues[b.id]
+                            : b.limit
+                        }
+                        onChange={(e) => handleEditChange(b.id, e.target.value)}
+                        onBlur={() => handleEditBlur(b.id)}
+                        onKeyDown={(e) => handleEditKeyDown(e, b.id)}
+                      />
+                      <span className="text-peach text-sm">
+                        / {formatCurrency(b.limit)}
+                      </span>
+                      <button
+                        className="ml-2 p-1 rounded-full bg-red/10 hover:bg-red/30 transition-colors"
+                        onClick={() => deleteBudget(b.id)}
+                        aria-label={`Delete budget for ${b.category}`}
+                      >
+                        <Trash2 className="h-5 w-5 text-red" />
+                      </button>
+                    </div>
+                  ) : (
+                    <span className="text-peach text-sm">
+                      {formatCurrency(b.spent)} / {formatCurrency(b.limit)}
+                    </span>
                   )}
                 </div>
                 <div className="w-full h-3 bg-peach/10 rounded-full overflow-hidden">
