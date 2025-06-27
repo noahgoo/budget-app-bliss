@@ -7,6 +7,7 @@ import {
 } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import "./index.css";
+import Header from "./components/Header";
 
 // Import pages (we'll create these next)
 import LoginPage from "./pages/LoginPage";
@@ -42,7 +43,8 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="min-h-screen bg-charcoal pt-20">
           <Routes>
             {/* Public routes */}
             <Route

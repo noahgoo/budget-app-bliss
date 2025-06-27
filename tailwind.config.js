@@ -52,6 +52,11 @@ module.exports = {
           800: "#991b1b",
           900: "#7f1d1d",
         },
+        sage: "#99B898",
+        peach: "#FFCEA8",
+        coral: "#FF847C",
+        red: "#E84A5F",
+        charcoal: "#2A363B",
       },
       fontFamily: {
         sans: ["Inter", "system-ui", "sans-serif"],

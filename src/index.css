@@ -5,43 +5,36 @@
 @layer base {
   html {
     font-family: "Inter", system-ui, sans-serif;
+    background: #2a363b;
   }
-
   body {
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-charcoal text-white;
   }
 }
 
 @layer components {
   .btn {
-    @apply px-4 py-2 rounded-lg font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply px-4 py-2 rounded-lg font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 shadow-none border-none;
   }
-
   .btn-primary {
-    @apply btn bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
+    @apply btn bg-sage text-charcoal hover:bg-peach focus:ring-sage;
   }
-
+  .btn-accent {
+    @apply btn bg-coral text-white hover:bg-red focus:ring-coral;
+  }
   .btn-secondary {
-    @apply btn bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500;
+    @apply btn bg-peach text-charcoal hover:bg-sage focus:ring-peach;
   }
-
-  .btn-danger {
-    @apply btn bg-danger-600 text-white hover:bg-danger-700 focus:ring-danger-500;
-  }
-
   .input {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+    @apply w-full px-4 py-3 rounded-lg bg-charcoal text-white border border-sage placeholder-peach focus:outline-none focus:ring-2 focus:ring-sage focus:border-transparent shadow-none;
   }
-
   .card {
-    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-6;
+    @apply bg-charcoal rounded-lg p-8;
   }
-
-  .card-header {
-    @apply border-b border-gray-200 pb-4 mb-4;
-  }
-
   .card-title {
-    @apply text-lg font-semibold text-gray-900;
+    @apply text-2xl font-semibold text-sage mb-2;
+  }
+  .card-subtitle {
+    @apply text-base text-peach mb-6;
   }
 }
