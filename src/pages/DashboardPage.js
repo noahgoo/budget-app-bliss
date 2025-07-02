@@ -25,14 +25,53 @@ ChartJS.register(
   Legend
 );
 
+const dummyTransactions = [
+  {
+    id: 1,
+    category: "Food",
+    amount: -45.5,
+    date: "2024-06-25",
+    desc: "Groceries",
+  },
+  {
+    id: 2,
+    category: "Transport",
+    amount: -20,
+    date: "2024-06-24",
+    desc: "Gas",
+  },
+  {
+    id: 3,
+    category: "Entertainment",
+    amount: -15,
+    date: "2024-06-23",
+    desc: "Movie",
+  },
+  {
+    id: 4,
+    category: "Food",
+    amount: -12.75,
+    date: "2024-06-22",
+    desc: "Lunch",
+  },
+  {
+    id: 5,
+    category: "Income",
+    amount: 2000,
+    date: "2024-06-20",
+    desc: "Paycheck",
+  },
+];
+
 const formatCurrency = (amount) =>
   amount.toLocaleString("en-US", { style: "currency", currency: "USD" });
 
-const getBarColor = (percent) => {
-  if (percent >= 90) return "bg-coral";
-  if (percent >= 75) return "bg-yellow-500";
-  return "bg-sage";
-};
+function getBarColor(percent) {
+  if (percent <= 60) return "bg-sage";
+  if (percent <= 80) return "bg-peach";
+  if (percent <= 100) return "bg-coral";
+  return "bg-red";
+}
 
 const DashboardPage = () => {
   const { currentUser } = useAuth();
@@ -58,7 +97,7 @@ const DashboardPage = () => {
       runningBalance += tx.amount;
       const txDate = format(startOfDay(new Date(tx.date)), "yyyy-MM-dd");
       if (balanceHistory.hasOwnProperty(txDate)) {
-        balanceHistory[txDate] = runningBalance; // Store cumulative balance at end of day
+        balanceHistory[txDate] = runningBalance;
       }
     });
 
@@ -67,7 +106,7 @@ const DashboardPage = () => {
     const dates = Object.keys(balanceHistory).sort();
     for (const date of dates) {
       if (balanceHistory[date] === 0 && date !== dates[0]) {
-        balanceHistory[date] = lastKnownBalance; // Carry forward
+        balanceHistory[date] = lastKnownBalance;
       } else {
         lastKnownBalance = balanceHistory[date];
       }
@@ -85,12 +124,12 @@ const DashboardPage = () => {
           label: "Balance",
           data: data,
           fill: false,
-          borderColor: "#A7F3D0", // sage color
+          borderColor: "#99B898", // sage color
           tension: 0.1,
-          pointBackgroundColor: "#A7F3D0",
-          pointBorderColor: "#A7F3D0",
-          pointHoverBackgroundColor: "#A7F3D0",
-          pointHoverBorderColor: "#A7F3D0",
+          pointBackgroundColor: "#99B898",
+          pointBorderColor: "#99B898",
+          pointHoverBackgroundColor: "#99B898",
+          pointHoverBorderColor: "#99B898",
         },
       ],
     };
@@ -111,12 +150,17 @@ const DashboardPage = () => {
             return formatCurrency(context.raw);
           },
         },
+        backgroundColor: "#2A363B",
+        titleColor: "#99B898",
+        bodyColor: "#FFCEA8",
+        borderColor: "#99B898",
+        borderWidth: 1,
       },
     },
     scales: {
       x: {
         ticks: {
-          color: "#A7F3D0", // sage
+          color: "#99B898", // sage
           autoSkip: true,
           maxTicksLimit: 7,
         },
@@ -124,12 +168,12 @@ const DashboardPage = () => {
           color: "#3B4742", // dark sage for grid
         },
         border: {
-          color: "#A7F3D0",
+          color: "#99B898",
         },
       },
       y: {
         ticks: {
-          color: "#A7F3D0", // sage
+          color: "#99B898", // sage
           callback: function (value) {
             return formatCurrency(value);
           },
@@ -138,7 +182,7 @@ const DashboardPage = () => {
           color: "#3B4742", // dark sage for grid
         },
         border: {
-          color: "#A7F3D0",
+          color: "#99B898",
         },
       },
     },
@@ -151,27 +195,11 @@ const DashboardPage = () => {
       </div>
 
       {/* Balance Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+      <div className="grid grid-cols-1 gap-4 mb-6">
         <div className="bg-sage/20 rounded-xl p-6 flex flex-col items-center">
           <div className="text-peach text-lg mb-1">Current Balance</div>
           <div className="text-3xl font-bold text-sage">
             {formatCurrency(currentMonthBalance)}
-          </div>
-        </div>
-        <div className="bg-charcoal border border-sage/30 rounded-xl p-6 flex flex-col items-center">
-          <div className="text-peach text-lg mb-1">Total Budget</div>
-          <div className="text-3xl font-bold text-sage">
-            {formatCurrency(budgetSummary.totalBudget)}
-          </div>
-        </div>
-        <div className="bg-charcoal border border-sage/30 rounded-xl p-6 flex flex-col items-center">
-          <div className="text-peach text-lg mb-1">Remaining</div>
-          <div
-            className={`text-3xl font-bold ${
-              budgetSummary.totalRemaining >= 0 ? "text-sage" : "text-coral"
-            }`}
-          >
-            {formatCurrency(budgetSummary.totalRemaining)}
           </div>
         </div>
       </div>
@@ -252,7 +280,7 @@ const DashboardPage = () => {
         </div>
       </div>
 
-      {/* Current Balance Graph */}
+      {/* Total Balance Graph */}
       <div className="bg-charcoal border border-sage/30 rounded-xl p-6">
         <div className="text-peach font-medium mb-4">
           Balance Trend (Last 30 Days)
