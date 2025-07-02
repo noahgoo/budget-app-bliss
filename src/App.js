@@ -42,11 +42,11 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <BudgetsProvider>
-          <TransactionsProvider>
+        <TransactionsProvider>
+          <BudgetsProvider>
             <AppLayout />
-          </TransactionsProvider>
-        </BudgetsProvider>
+          </BudgetsProvider>
+        </TransactionsProvider>
       </AuthProvider>
     </Router>
   );

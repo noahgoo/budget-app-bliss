@@ -6,6 +6,25 @@ import { Pencil, Trash2 } from "lucide-react";
 const formatCurrency = (amount) =>
   amount.toLocaleString("en-US", { style: "currency", currency: "USD" });
 
+// Map transaction category names to budget category names (same as in BudgetsContext)
+const mapTransactionCategoryToBudget = (transactionCategory) => {
+  const categoryMapping = {
+    "Food & Dining": "Food",
+    Transportation: "Transport",
+    Entertainment: "Entertainment",
+    Shopping: "Shopping",
+    Healthcare: "Health",
+    Education: "Education",
+    Utilities: "Utilities",
+    Housing: "Housing",
+    Insurance: "Insurance",
+    Savings: "Savings",
+    Other: "Other",
+  };
+
+  return categoryMapping[transactionCategory] || transactionCategory;
+};
+
 function getBarColor(percent) {
   if (percent <= 60) return "bg-sage";
   if (percent <= 80) return "bg-peach";
@@ -32,9 +51,16 @@ const BudgetsPage = () => {
 
   const handleSave = (e) => {
     e.preventDefault();
-    const categoryName =
+    const selectedCategoryName =
       selectedCategory === "custom" ? customCategory : selectedCategory;
-    addBudget({ category: categoryName, limit: parseFloat(amount) });
+
+    // Map transaction category to budget category for consistency
+    const budgetCategoryName =
+      selectedCategory === "custom"
+        ? customCategory
+        : mapTransactionCategoryToBudget(selectedCategoryName);
+
+    addBudget({ category: budgetCategoryName, limit: parseFloat(amount) });
     setShowModal(false);
   };
 

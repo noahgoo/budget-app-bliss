@@ -1,56 +1,15 @@
-import React, { createContext, useContext, useState } from "react";
-
-const dummyTransactions = [
-  {
-    id: 1,
-    category: "Food",
-    desc: "Groceries",
-    amount: -45.5,
-    date: "2024-06-25",
-  },
-  {
-    id: 2,
-    category: "Transport",
-    desc: "Gas",
-    amount: -20,
-    date: "2024-06-24",
-  },
-  {
-    id: 3,
-    category: "Entertainment",
-    desc: "Movie",
-    amount: -15,
-    date: "2024-06-23",
-  },
-  {
-    id: 4,
-    category: "Food",
-    desc: "Lunch",
-    amount: -12.75,
-    date: "2024-06-22",
-  },
-  {
-    id: 5,
-    category: "Income",
-    desc: "Paycheck",
-    amount: 2000,
-    date: "2024-06-20",
-  },
-  {
-    id: 6,
-    category: "Shopping",
-    desc: "Clothes",
-    amount: -80,
-    date: "2024-06-19",
-  },
-  {
-    id: 7,
-    category: "Savings",
-    desc: "Transfer to Savings",
-    amount: -100,
-    date: "2024-06-18",
-  },
-];
+import React, { createContext, useContext, useState, useEffect } from "react";
+import { db } from "../firebase/config";
+import {
+  collection,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  query,
+  orderBy,
+} from "firebase/firestore";
 
 const TransactionsContext = createContext();
 
@@ -59,26 +18,28 @@ export function useTransactions() {
 }
 
 export function TransactionsProvider({ children }) {
-  const [transactions, setTransactions] = useState(dummyTransactions);
+  const [transactions, setTransactions] = useState([]);
 
-  function addTransaction(newTx) {
-    setTransactions((prev) => [
-      {
-        id: prev.length ? Math.max(...prev.map((t) => t.id)) + 1 : 1,
-        ...newTx,
-      },
-      ...prev,
-    ]);
+  useEffect(() => {
+    const q = query(collection(db, "transactions"), orderBy("date", "desc"));
+    const unsub = onSnapshot(q, (snapshot) => {
+      setTransactions(
+        snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+      );
+    });
+    return () => unsub();
+  }, []);
+
+  async function addTransaction(newTx) {
+    await addDoc(collection(db, "transactions"), newTx);
   }
 
-  function deleteTransaction(id) {
-    setTransactions((prev) => prev.filter((t) => t.id !== id));
+  async function deleteTransaction(id) {
+    await deleteDoc(doc(db, "transactions", id));
   }
 
-  function updateTransaction(id, updatedFields) {
-    setTransactions((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, ...updatedFields } : t))
-    );
+  async function updateTransaction(id, updatedFields) {
+    await updateDoc(doc(db, "transactions", id), updatedFields);
   }
 
   return (
