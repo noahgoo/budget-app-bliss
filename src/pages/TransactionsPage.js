@@ -1,5 +1,9 @@
 import React, { useState } from "react";
 import { useTransactions } from "../contexts/TransactionsContext";
+import PlaidLink from "../components/PlaidLink";
+import { useAuth } from "../contexts/AuthContext"; // Assuming you have an AuthContext that provides the user
+import { functions } from "../firebase/config";
+import { httpsCallable } from "firebase/functions";
 import { TRANSACTION_CATEGORIES } from "../constants/categories";
 import { Pencil, Trash2 } from "lucide-react";
 
@@ -11,7 +15,9 @@ const today = () => new Date().toISOString().slice(0, 10);
 const TransactionsPage = () => {
   const { transactions, addTransaction, deleteTransaction, updateTransaction } =
     useTransactions();
+  const { currentUser } = useAuth(); // Get the user from AuthContext
   const [showModal, setShowModal] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
   const [category, setCategory] = useState("");
   const [amount, setAmount] = useState("");
   const [desc, setDesc] = useState("");
@@ -35,12 +41,35 @@ const TransactionsPage = () => {
     setShowModal(false);
   };
 
+  const handleSyncTransactions = async () => {
+    if (isSyncing) return;
+    setIsSyncing(true);
+    console.log("Starting transaction sync...");
+    try {
+      const syncTransactions = httpsCallable(functions, 'syncTransactions');
+      const result = await syncTransactions();
+      console.log("Sync finished successfully:", result);
+      // Here, you should trigger a refetch of your transactions from Firestore
+      // to update the UI. I'll assume your useTransactions hook has a refetch method.
+      // refetchTransactions(); 
+    } catch (error) {
+      console.error("Error syncing transactions:", error);
+    } finally {
+      setIsSyncing(false);
+      console.log("Sync process finished.");
+    }
+  };
+
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between mb-4">
         <h1 className="text-sage text-2xl font-semibold">Transactions</h1>
         <button className="btn-accent" onClick={handleOpenModal}>
           + Add Transaction
+        </button>
+        <PlaidLink user={currentUser} />
+        <button className="btn-primary" onClick={handleSyncTransactions} disabled={isSyncing}>
+          {isSyncing ? "Syncing..." : "Sync Transactions"}
         </button>
       </div>
       <div className="bg-charcoal border border-sage/30 rounded-xl p-6 min-h-[180px] relative">
