@@ -22,16 +22,7 @@ const ProfilePage = () => {
             <div className="text-xs text-peach">Email</div>
             <div className="text-sage font-medium">{dummyUser.email}</div>
           </div>
-          <div className="flex gap-8">
-            <div>
-              <div className="text-xs text-peach">Currency</div>
-              <div className="text-sage font-medium">{dummyUser.currency}</div>
-            </div>
-            <div>
-              <div className="text-xs text-peach">Theme</div>
-              <div className="text-sage font-medium">{dummyUser.theme}</div>
-            </div>
-          </div>
+          <div className="flex gap-8"></div>
         </div>
         <button className="btn-accent w-full">Log out</button>
       </div>
