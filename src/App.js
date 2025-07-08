@@ -54,6 +54,7 @@ function App() {
 
 function AppLayout() {
   const { currentUser } = useAuth();
+  console.log("AppLayout: currentUser", currentUser); // Add this line
   return (
     <div className="min-h-screen bg-charcoal flex flex-col">
       <Header />
@@ -82,33 +83,33 @@ function AppLayout() {
           <Route
             path="/dashboard"
             element={
-              // <ProtectedRoute>
-              <DashboardPage />
-              // </ProtectedRoute>
+              <ProtectedRoute>
+                <DashboardPage />
+              </ProtectedRoute>
             }
           />
           <Route
             path="/transactions"
             element={
-              // <ProtectedRoute>
-              <TransactionsPage />
-              // </ProtectedRoute>
+              <ProtectedRoute>
+                <TransactionsPage />
+              </ProtectedRoute>
             }
           />
           <Route
             path="/budgets"
             element={
-              // <ProtectedRoute>
-              <BudgetsPage />
-              //</ProtectedRoute>
+              <ProtectedRoute>
+                <BudgetsPage />
+              </ProtectedRoute>
             }
           />
           <Route
             path="/profile"
             element={
-              // <ProtectedRoute>
-              <ProfilePage />
-              //</ProtectedRoute>
+              <ProtectedRoute>
+                <ProfilePage />
+              </ProtectedRoute>
             }
           />
 

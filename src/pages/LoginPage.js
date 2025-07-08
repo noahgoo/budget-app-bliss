@@ -27,7 +27,7 @@ const LoginPage = () => {
       await login(email, password);
       navigate("/dashboard");
     } catch (error) {
-      console.error("Login error:", error);
+      console.error("Login error:", error); // Added this line
       switch (error.code) {
         case "auth/user-not-found":
           setError("No account found with this email address");

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useAuth } from "../contexts/AuthContext";
 import { useBudgets } from "../contexts/BudgetsContext";
 import { useTransactions } from "../contexts/TransactionsContext";
@@ -13,7 +13,10 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { format, subDays, startOfDay } from "date-fns";
+import { format, subDays, startOfDay, parseISO } from "date-fns";
+import { RefreshCw } from "lucide-react";
+import FirebaseDiagnostic from "../components/FirebaseDiagnostic";
+import Notification from "../components/Notification";
 
 ChartJS.register(
   CategoryScale,
@@ -24,44 +27,6 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-
-const dummyTransactions = [
-  {
-    id: 1,
-    category: "Food",
-    amount: -45.5,
-    date: "2024-06-25",
-    desc: "Groceries",
-  },
-  {
-    id: 2,
-    category: "Transport",
-    amount: -20,
-    date: "2024-06-24",
-    desc: "Gas",
-  },
-  {
-    id: 3,
-    category: "Entertainment",
-    amount: -15,
-    date: "2024-06-23",
-    desc: "Movie",
-  },
-  {
-    id: 4,
-    category: "Food",
-    amount: -12.75,
-    date: "2024-06-22",
-    desc: "Lunch",
-  },
-  {
-    id: 5,
-    category: "Income",
-    amount: 2000,
-    date: "2024-06-20",
-    desc: "Paycheck",
-  },
-];
 
 const formatCurrency = (amount) =>
   amount.toLocaleString("en-US", { style: "currency", currency: "USD" });
@@ -76,12 +41,30 @@ function getBarColor(percent) {
 const DashboardPage = () => {
   const { currentUser } = useAuth();
   const { budgets, budgetSummary, currentMonthBalance } = useBudgets();
-  const { transactions } = useTransactions();
+  const { transactions, syncing, lastSyncTime, syncPlaidTransactions } =
+    useTransactions();
+  const [showDiagnostic, setShowDiagnostic] = useState(false);
+  const [notification, setNotification] = useState(null);
+
+  const handleManualSync = async () => {
+    const result = await syncPlaidTransactions();
+    if (result.success) {
+      setNotification({
+        type: "success",
+        message: result.message,
+      });
+    } else {
+      setNotification({
+        type: "error",
+        message: result.error,
+      });
+    }
+  };
 
   // Prepare data for the balance chart
   const getBalanceChartData = () => {
     const sortedTransactions = [...transactions].sort(
-      (a, b) => new Date(a.date) - new Date(b.date)
+      (a, b) => parseISO(a.date).getTime() - parseISO(b.date).getTime()
     );
 
     const balanceHistory = {};
@@ -95,7 +78,7 @@ const DashboardPage = () => {
 
     sortedTransactions.forEach((tx) => {
       runningBalance += tx.amount;
-      const txDate = format(startOfDay(new Date(tx.date)), "yyyy-MM-dd");
+      const txDate = format(startOfDay(parseISO(tx.date)), "yyyy-MM-dd");
       if (balanceHistory.hasOwnProperty(txDate)) {
         balanceHistory[txDate] = runningBalance;
       }
@@ -113,7 +96,7 @@ const DashboardPage = () => {
     }
 
     const labels = Object.keys(balanceHistory).map((date) =>
-      format(new Date(date), "MMM dd")
+      format(parseISO(date), "MMM dd")
     );
     const data = Object.values(balanceHistory);
 
@@ -190,9 +173,49 @@ const DashboardPage = () => {
 
   return (
     <div className="space-y-8">
-      <div className="text-sage text-2xl font-semibold mb-2">
-        Welcome, {currentUser?.displayName || "Friend"}!
+      {notification && (
+        <Notification
+          type={notification.type}
+          message={notification.message}
+          onClose={() => setNotification(null)}
+        />
+      )}
+      <div className="flex justify-between items-center mb-2">
+        <div className="text-sage text-2xl font-semibold">
+          Welcome, {currentUser?.displayName || "Friend"}!
+        </div>
+        <div className="flex items-center gap-2">
+          {syncing && (
+            <div className="flex items-center gap-2 text-sage/60 text-sm">
+              <RefreshCw className="h-4 w-4 animate-spin" />
+              Syncing...
+            </div>
+          )}
+          {lastSyncTime && !syncing && (
+            <div className="text-sage/60 text-xs">
+              Last synced: {lastSyncTime.toLocaleTimeString()}
+            </div>
+          )}
+          <button
+            onClick={handleManualSync}
+            disabled={syncing}
+            className="p-2 rounded-full hover:bg-peach/10 transition-colors disabled:opacity-50"
+            aria-label="Sync Transactions"
+          >
+            <RefreshCw
+              className={`h-5 w-5 text-peach ${syncing ? "animate-spin" : ""}`}
+            />
+          </button>
+          <button
+            onClick={() => setShowDiagnostic(!showDiagnostic)}
+            className="text-sage/60 hover:text-sage text-sm"
+          >
+            {showDiagnostic ? "Hide" : "Show"} Diagnostic
+          </button>
+        </div>
       </div>
+
+      {showDiagnostic && <FirebaseDiagnostic />}
 
       {/* Balance Overview */}
       <div className="grid grid-cols-1 gap-4 mb-6">
@@ -257,9 +280,11 @@ const DashboardPage = () => {
                 className="py-2 flex items-center justify-between"
               >
                 <div>
-                  <div className="text-sage font-medium text-sm">{tx.desc}</div>
+                  <div className="text-sage font-medium text-sm">
+                    {tx.description || tx.desc}
+                  </div>
                   <div className="text-peach text-xs">
-                    {tx.category} • {tx.date}
+                    {tx.category} • {format(parseISO(tx.date), "MMM dd, yyyy")}
                   </div>
                 </div>
                 <div

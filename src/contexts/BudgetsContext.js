@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useMemo } from "react";
 import { dummyBudgets } from "../constants/dummyBudgets";
 import { useTransactions } from "./TransactionsContext";
+import { parseISO } from "date-fns";
 
 const BudgetsContext = createContext();
 
@@ -82,7 +83,7 @@ export function BudgetsProvider({ children }) {
     const currentYear = currentDate.getFullYear();
 
     const currentMonthTransactions = transactions.filter((tx) => {
-      const txDate = new Date(tx.date);
+      const txDate = parseISO(tx.date);
       return (
         txDate.getMonth() === currentMonth &&
         txDate.getFullYear() === currentYear
